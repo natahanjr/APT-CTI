@@ -1,0 +1,32 @@
+bundle: F:\My Project\apt-cti-thesis\model\deploy_live_netflow.joblib
+input:
+  path: F:\My Project\apt-cti-thesis\deploy\_e2e\runtime_flows.jsonl
+  format: jsonl
+  start_at_end: true
+batch:
+  max_flows: 64
+  flush_s: 1.0
+feeds:
+  online: false
+  poll_interval_min: 5
+  ttl_hours: 168.0
+  half_life_h: 6.0
+  snapshot_dir: F:\My Project\apt-cti-thesis\data\feed_snapshots
+alerts:
+  jsonl: F:\My Project\apt-cti-thesis\deploy\_e2e\alerts_b.jsonl
+  rotate_mb: 50.0
+  keep_files: 8
+  audit_log: ""
+  webhook_url: ""
+  syslog_host: ""
+  syslog_port: 514
+  top_k_reasons: 3
+auth:
+  token: ""
+  explain_per_min: 12
+health:
+  host: 127.0.0.1
+  port: 18100
+xai:
+  reasoning_effort: low
+  timeout_s: 60
