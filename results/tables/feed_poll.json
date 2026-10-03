@@ -1,0 +1,13 @@
+{
+  "n_records": 15721,
+  "store_stats": {
+    "total": 16193,
+    "type:ipv4": 5,
+    "type:url": 16188,
+    "source:feodo": 5,
+    "source:threatfox": 214,
+    "source:urlhaus": 15974
+  },
+  "provenance": "live",
+  "polled_at": 1790906492.138019
+}
