@@ -3,7 +3,7 @@
 **Repository:** `APT-CTI`  
 **Type:** Research artefact / thesis implementation  
 **Language:** Python 3.11+  
-**Licence:** [MIT](LICENSE) — free to use, study, and build upon (see [LICENSE](LICENSE))  
+**Licence:** [RazForge Source Available](LICENSE) — free for education & research; commercial use needs a separate agreement (razforge@proton.me)  
 
 This repository implements the experimental pipeline, evaluation suite, and real-time scoring prototype described in the thesis *Real-Time Cyber Threat Intelligence Fusion with Explainable Machine Learning for Early APT Prediction*.
 
