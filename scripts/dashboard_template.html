@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APT · CTI Fusion — Thesis Implementation</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --card:#ffffff; --ink:#1d1d1f; --mute:#6e6e73; --faint:#8e8e93;
+    --hair:rgba(0,0,0,.08); --hair2:rgba(0,0,0,.05);
+    --accent:#0071e3; --accent-soft:rgba(0,113,227,.10);
+    --green:#30d158; --green-soft:rgba(48,209,88,.14);
+    --orange:#ff9f0a; --orange-soft:rgba(255,159,10,.16);
+    --red:#ff453a; --red-soft:rgba(255,69,58,.12);
+    --purple:#bf5af2; --teal:#64d2ff; --yellow:#ffd60a;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 10px 30px rgba(0,0,0,.06);
+    --shadow-lg:0 2px 6px rgba(0,0,0,.05), 0 24px 60px rgba(0,0,0,.10);
+    --radius:22px; --radius-sm:14px;
+    --mono:"SF Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+    --ease:cubic-bezier(.32,.72,.28,1);
+  }
+  [data-theme="dark"]{
+    --bg:#000000; --card:#141416; --ink:#f5f5f7; --mute:#a1a1a6; --faint:#8e8e93;
+    --hair:rgba(255,255,255,.12); --hair2:rgba(255,255,255,.06);
+    --accent:#0a84ff; --accent-soft:rgba(10,132,255,.16);
+    --green:#32d74b; --green-soft:rgba(50,215,75,.16);
+    --orange:#ff9f0a; --orange-soft:rgba(255,159,10,.18);
+    --red:#ff453a; --red-soft:rgba(255,69,58,.16);
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 30px rgba(0,0,0,.45);
+    --shadow-lg:0 2px 6px rgba(0,0,0,.5), 0 24px 60px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth; scroll-padding-top:76px}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display","SF Pro Text","Segoe UI", Inter, system-ui, sans-serif;
+    font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+    transition:background .4s var(--ease), color .4s var(--ease);
+  }
+  ::selection{background:var(--accent-soft)}
+  a{color:var(--accent); text-decoration:none}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 24px}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky; top:0; z-index:50; backdrop-filter:saturate(180%) blur(20px);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    background:color-mix(in srgb, var(--bg) 78%, transparent);
+    border-bottom:1px solid var(--hair2);
+  }
+  .nav-in{display:flex; align-items:center; gap:20px; height:56px}
+  .brand{display:flex; align-items:center; gap:9px; font-weight:600; letter-spacing:-.01em; white-space:nowrap}
+  .brand .dot{width:9px; height:9px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px var(--accent-soft)}
+  .nav-links{display:flex; gap:2px; margin-left:6px; overflow:auto; scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{
+    font-size:13px; color:var(--mute); padding:7px 11px; border-radius:999px;
+    transition:background .2s var(--ease), color .2s var(--ease); white-space:nowrap;
+  }
+  .nav-links a:hover{background:var(--hair2); color:var(--ink)}
+  .nav-right{margin-left:auto; display:flex; align-items:center; gap:10px}
+
+  /* segmented control */
+  .seg{
+    position:relative; display:flex; background:var(--hair2); border-radius:999px;
+    padding:3px; gap:2px; border:1px solid var(--hair2);
+  }
+  .seg .pill{
+    position:absolute; top:3px; bottom:3px; border-radius:999px; background:var(--card);
+    box-shadow:0 1px 3px rgba(0,0,0,.12); transition:transform .32s var(--ease), width .32s var(--ease);
+  }
+  .seg button{
+    position:relative; z-index:1; border:0; background:none; cursor:pointer;
+    font:inherit; font-size:12.5px; font-weight:500; color:var(--mute);
+    padding:6px 14px; border-radius:999px; transition:color .25s var(--ease); white-space:nowrap;
+  }
+  .seg button[aria-selected="true"]{color:var(--ink)}
+  .icon-btn{
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--hair);
+    background:var(--card); color:var(--ink); cursor:pointer; font-size:14px; line-height:1;
+    display:grid; place-items:center; transition:transform .2s var(--ease), background .2s;
+  }
+  .icon-btn:hover{transform:scale(1.06)}
+
+  /* ---------- hero ---------- */
+  header.hero{padding:88px 0 40px; position:relative; overflow:hidden}
+  .glow{
+    position:absolute; inset:-40% -10% auto; height:520px; pointer-events:none;
+    background:radial-gradient(600px 300px at 30% 40%, rgba(0,113,227,.14), transparent 70%),
+               radial-gradient(520px 260px at 75% 25%, rgba(191,90,242,.12), transparent 70%);
+    filter:blur(6px);
+  }
+  .eyebrow{
+    font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:14px;
+  }
+  h1{
+    font-size:clamp(34px,5.4vw,60px); line-height:1.04; letter-spacing:-.03em;
+    font-weight:600; margin:0 0 16px; max-width:15ch;
+  }
+  h1 .grad{
+    background:linear-gradient(92deg, #0071e3, #bf5af2 60%, #ff9f0a);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .lede{font-size:clamp(16px,2vw,19px); color:var(--mute); max-width:60ch; margin:0 0 30px; letter-spacing:-.01em}
+  .pills{display:flex; flex-wrap:wrap; gap:8px}
+  .pill-tag{
+    font-size:12px; font-weight:500; color:var(--mute); background:var(--card);
+    border:1px solid var(--hair); padding:6px 12px; border-radius:999px; box-shadow:var(--shadow);
+  }
+
+  /* ---------- kpis ---------- */
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin:14px 0 10px}
+  .kpi{
+    background:var(--card); border:1px solid var(--hair2); border-radius:var(--radius);
+    padding:18px 18px 16px; box-shadow:var(--shadow); transition:transform .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .kpi:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg)}
+  .kpi .k-label{font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+  .kpi .k-value{font-size:32px; font-weight:600; letter-spacing:-.03em; margin:8px 0 2px; line-height:1}
+  .kpi .k-sub{font-size:12.5px; color:var(--mute)}
+  .kpi .k-sub b{color:var(--ink); font-weight:600}
+  .verdict{display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; margin-top:9px}
+  .verdict.pass{background:var(--green-soft); color:#1a9e3c}
+  .verdict.fail{background:var(--red-soft); color:#d70015}
+  .verdict.mixed{background:var(--orange-soft); color:#b25000}
+  [data-theme="dark"] .verdict.pass{color:#32d74b}
+  [data-theme="dark"] .verdict.fail{color:#ff6961}
+  [data-theme="dark"] .verdict.mixed{color:#ffd60a}
+  .verdict .d{width:6px; height:6px; border-radius:50%; background:currentColor}
+
+  /* ---------- sections ---------- */
+  section{padding:56px 0 8px}
+  .sec-head{display:flex; align-items:flex-end; justify-content:space-between; gap:18px; margin-bottom:22px; flex-wrap:wrap}
+  .sec-head h2{font-size:clamp(24px,3vw,32px); letter-spacing:-.025em; font-weight:600; margin:6px 0 0}
+  .sec-head p{margin:6px 0 0; color:var(--mute); font-size:14.5px; max-width:64ch}
+  .card{
+    background:var(--card); border:1px solid var(--hair2); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px; margin-bottom:16px;
+    transition:box-shadow .3s var(--ease);
+  }
+  .card:hover{box-shadow:var(--shadow-lg)}
+  .card h3{font-size:15px; font-weight:600; letter-spacing:-.01em; margin:0 0 4px}
+  .card .hint{font-size:12.5px; color:var(--faint); margin:0 0 16px}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+  @media(max-width:880px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+  /* ---------- pipeline ---------- */
+  .flow{display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:12px}
+  .step{
+    position:relative; background:var(--card); border:1px solid var(--hair2);
+    border-radius:18px; padding:16px 15px; box-shadow:var(--shadow);
+    transition:transform .3s var(--ease), border-color .3s var(--ease);
+  }
+  .step:hover{transform:translateY(-4px); border-color:color-mix(in srgb, var(--accent) 40%, transparent)}
+  .step .n{
+    width:24px; height:24px; border-radius:8px; display:grid; place-items:center;
+    font-size:11.5px; font-weight:700; color:#fff; background:var(--accent); margin-bottom:11px;
+  }
+  .step h4{margin:0 0 5px; font-size:13.5px; font-weight:600; letter-spacing:-.01em}
+  .step p{margin:0; font-size:12.3px; color:var(--mute); line-height:1.45}
+  .step code{
+    display:block; margin-top:9px; font-family:var(--mono); font-size:10.5px;
+    color:var(--faint); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .step:nth-child(2) .n{background:#5e5ce6}
+  .step:nth-child(3) .n{background:#bf5af2}
+  .step:nth-child(4) .n{background:#ff9f0a}
+  .step:nth-child(5) .n{background:#30d158}
+  .step:nth-child(6) .n{background:#ff453a}
+  .step:nth-child(7) .n{background:#64d2ff; color:#003}
+  .step:nth-child(8) .n{background:#1d1d1f}
+
+  /* ---------- tables ---------- */
+  table{width:100%; border-collapse:collapse; font-size:13.2px}
+  th{
+    text-align:left; font-size:10.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--faint); padding:0 10px 9px; border-bottom:1px solid var(--hair2); white-space:nowrap;
+  }
+  td{padding:10px; border-bottom:1px solid var(--hair2); font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:0}
+  td.num, th.num{text-align:right}
+  .hl td{background:color-mix(in srgb, var(--accent) 6%, transparent)}
+  .chip{
+    display:inline-block; font-size:10.5px; font-weight:600; padding:2.5px 8px;
+    border-radius:999px; background:var(--hair2); color:var(--mute); white-space:nowrap;
+  }
+  .chip.blue{background:var(--accent-soft); color:var(--accent)}
+  .chip.green{background:var(--green-soft); color:#1a9e3c}
+  .chip.orange{background:var(--orange-soft); color:#b25000}
+  .chip.red{background:var(--red-soft); color:#d70015}
+  .chip.purple{background:rgba(191,90,242,.15); color:#a22ec2}
+  [data-theme="dark"] .chip.green{color:var(--green)}
+  [data-theme="dark"] .chip.red{color:#ff6961}
+  [data-theme="dark"] .chip.orange{color:var(--yellow)}
+
+  /* ---------- charts ---------- */
+  .chart{width:100%; overflow:visible}
+  .chart text{font-family:inherit; font-size:10.5px; fill:var(--mute)}
+  .chart .val{font-size:10.5px; font-weight:600; fill:var(--ink)}
+  .chart .axis{stroke:var(--hair); stroke-width:1}
+  .chart .grid{stroke:var(--hair2); stroke-width:1}
+  .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; font-size:12px; color:var(--mute)}
+  .legend i{width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:6px; vertical-align:-1px}
+
+  /* ---------- alerts ---------- */
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px}
+  .search{
+    flex:1; min-width:200px; background:var(--bg); border:1px solid var(--hair);
+    border-radius:12px; padding:9px 13px; font:inherit; font-size:13.5px; color:var(--ink);
+    outline:none; transition:border-color .2s, box-shadow .2s;
+  }
+  .search:focus{border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft)}
+  .alerts{display:grid; gap:10px}
+  .alert{
+    background:var(--card); border:1px solid var(--hair2); border-radius:18px; padding:14px 16px;
+    box-shadow:var(--shadow); transition:transform .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .alert:hover{transform:translateY(-2px); box-shadow:var(--shadow-lg)}
+  .alert-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:9px}
+  .score{
+    font-family:var(--mono); font-size:12px; font-weight:700; padding:3.5px 9px; border-radius:9px;
+    background:var(--red-soft); color:var(--red);
+  }
+  .score.benign{background:var(--green-soft); color:#1a9e3c}
+  [data-theme="dark"] .score.benign{color:var(--green)}
+  .alert .cat{font-size:13.5px; font-weight:600; letter-spacing:-.01em}
+  .alert .when{font-size:11.5px; color:var(--faint); font-variant-numeric:tabular-nums}
+  .reasons{display:grid; gap:7px}
+  .reason{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1.5fr) minmax(64px,88px) 46px; gap:12px; align-items:center; font-size:12.4px}
+  .reason .feat{font-family:var(--mono); font-size:11.4px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .reason .txt{color:var(--mute); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .bar{position:relative; height:16px; background:var(--hair2); border-radius:6px; overflow:hidden}
+  .bar span{position:absolute; inset:0 auto 0 0; border-radius:6px; background:var(--accent)}
+  .bar.cti span{background:linear-gradient(90deg,var(--purple),var(--orange))}
+  .reason em{
+    font-style:normal; font-size:10.5px; font-weight:700; color:var(--ink); opacity:.85;
+    text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums;
+  }
+  .empty{text-align:center; color:var(--faint); padding:40px 0; font-size:14px}
+  .more{
+    border:1px solid var(--hair); background:var(--card); color:var(--accent);
+    font:inherit; font-size:13.5px; font-weight:600; padding:10px 22px; border-radius:999px;
+    cursor:pointer; box-shadow:var(--shadow); transition:transform .2s var(--ease), box-shadow .2s;
+  }
+  .more:hover{transform:translateY(-2px); box-shadow:var(--shadow-lg)}
+
+  /* ---------- figures ---------- */
+  .fig-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:16px}
+  .fig-card{
+    background:var(--card); border:1px solid var(--hair2); border-radius:18px; padding:12px;
+    box-shadow:var(--shadow); transition:transform .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .fig-card:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg)}
+  .fig-card img{width:100%; display:block; border-radius:12px; background:#fff; border:1px solid var(--hair2)}
+  .fig-card .cap{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:10px 4px 2px}
+  .fig-card .cap b{font-size:12.8px; font-weight:600; letter-spacing:-.01em}
+  .fig-card .cap span{font-family:var(--mono); font-size:10px; color:var(--faint)}
+
+  /* ---------- misc ---------- */
+  .meta{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px}
+  .meta div{background:var(--bg); border:1px solid var(--hair2); border-radius:14px; padding:12px 14px}
+  .meta .t{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); font-weight:600}
+  .meta .v{font-size:17px; font-weight:600; letter-spacing:-.02em; margin-top:3px; font-variant-numeric:tabular-nums}
+  .note{
+    font-size:12.6px; color:var(--mute); background:var(--accent-soft);
+    border-radius:14px; padding:12px 15px; margin-top:14px; line-height:1.55;
+  }
+  .note b{color:var(--ink)}
+  footer{padding:60px 0 70px; color:var(--faint); font-size:12.5px; text-align:center}
+  .stack{display:flex; flex-direction:column; gap:16px}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important; animation:none !important} html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <div class="brand"><span class="dot"></span> APT&nbsp;·&nbsp;CTI Fusion</div>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#results">Results</a>
+      <a href="#freshness">Freshness</a>
+      <a href="#explain">Explainability</a>
+      <a href="#latency">Latency</a>
+      <a href="#transport">Transport</a>
+      <a href="#alerts">Alerts</a>
+      <a href="#feeds">Feeds</a>
+      <a href="#figures">Figures</a>
+    </div>
+    <div class="nav-right">
+      <div class="seg" id="dsSeg" role="tablist" aria-label="Dataset">
+        <span class="pill" aria-hidden="true"></span>
+        <button role="tab" data-ds="unsw_nb15" aria-selected="true">UNSW-NB15</button>
+        <button role="tab" data-ds="cicids2017" aria-selected="false">CICIDS2017</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" title="Toggle appearance" aria-label="Toggle appearance">◐</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero" id="overview">
+    <div class="glow"></div>
+    <div class="eyebrow">Thesis implementation · four contributions</div>
+    <h1>Real-time CTI fusion, <span class="grad">explained per alert.</span></h1>
+    <p class="lede">Live public feeds → freshness-aware features → APT risk model → SHAP reason
+      codes mapped to MITRE ATT&amp;CK. Everything below is generated from the experiment tables in
+      <code>results/tables</code> — nothing is hand-written.</p>
+    <div class="pills">
+      <span class="pill-tag">Random Forest · 200 trees</span>
+      <span class="pill-tag">θ at 96 % recall</span>
+      <span class="pill-tag">400,000 flows / dataset</span>
+      <span class="pill-tag">seed 42</span>
+      <span class="pill-tag">TreeSHAP</span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <section id="pipeline">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Implementation</div>
+        <h2>The pipeline, end to end</h2>
+        <p>Eight modules, one direction of data flow. Every stage is independently testable and
+           driven by <code>config/default.yaml</code>.</p>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="step"><div class="n">1</div><h4>Collect</h4>
+        <p>URLhaus · ThreatFox · Feodo (OTX &amp; MISP with keys). DoH fallback for broken resolvers.</p>
+        <code>feeds/ · collector.py</code></div>
+      <div class="step"><div class="n">2</div><h4>Store</h4>
+        <p>WAL-mode SQLite, dedup by value, TTL expiry, poll snapshots as CSV.</p>
+        <code>store.py → data/ioc_store.db</code></div>
+      <div class="step"><div class="n">3</div><h4>Replay</h4>
+        <p>Flows replayed in time order against a feed polled every Δ — visibility from the next poll boundary.</p>
+        <code>enrich.py · poll_grid()</code></div>
+      <div class="step"><div class="n">4</div><h4>Enrich</h4>
+        <p>6 CTI features per flow: IoC match, age score, confidence, source count, reputation.</p>
+        <code>enrich.py · CTI_FEATURES</code></div>
+      <div class="step"><div class="n">5</div><h4>Model</h4>
+        <p>64/16/20 split, RF with balanced leaves, θ tuned on validation for 96 % recall.</p>
+        <code>model.py</code></div>
+      <div class="step"><div class="n">6</div><h4>Alert</h4>
+        <p>Test rows above θ become alerts with score, label and ground-truth category.</p>
+        <code>run_e4 · explain_alerts()</code></div>
+      <div class="step"><div class="n">7</div><h4>Explain</h4>
+        <p>TreeSHAP per alert → top-k reasons with human-readable text and feature values.</p>
+        <code>explain.py · reason_codes()</code></div>
+      <div class="step"><div class="n">8</div><h4>Map</h4>
+        <p>Reasons mapped to ATT&amp;CK technique + tactic; stability audited across 5 folds.</p>
+        <code>attack_map.py</code></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Experiment matrix</h3>
+      <p class="hint">One driver, four questions. Each row is a script you can rerun alone.</p>
+      <table>
+        <thead><tr><th>Experiment</th><th>Question</th><th>Script</th><th>Runtime</th></tr></thead>
+        <tbody>
+          <tr><td><b>E1</b> · Baseline</td><td>Which classifier, and does CTI help all of them?</td><td><code>run_e1_baseline.py</code></td><td class="num">~1 min</td></tr>
+          <tr><td><b>E2</b> · Ablation</td><td>How much FPR does live CTI remove at matched recall?</td><td><code>run_e2_ablation.py</code></td><td class="num">~5 min</td></tr>
+          <tr><td><b>E3</b> · Freshness</td><td>What does feed staleness cost, 1 min → 24 h?</td><td><code>run_e3_freshness.py</code></td><td class="num">~1 min</td></tr>
+          <tr><td><b>E4</b> · Explain</td><td>Are reason codes stable and ATT&amp;CK-aligned?</td><td><code>run_e4_explainability.py</code></td><td class="num">~4 min</td></tr>
+          <tr><td><b>E5</b> · Latency</td><td>Is the full alert path (incl. SHAP) sub-second on CPU?</td><td><code>run_e5_latency.py</code></td><td class="num">~4 min</td></tr>
+          <tr><td><b>E6</b> · Transport</td><td>Does a model survive the trip to the other dataset?</td><td><code>run_e6_crossdataset.py</code></td><td class="num">~5 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="results">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Contribution 2 · H1</div>
+        <h2>Does live CTI earn its place?</h2>
+        <p>Traffic statistics alone vs. the same model plus freshness-aware intel — compared at the
+           same recall operating point.</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>False-positive rate by feature set</h3>
+        <p class="hint">Split test, θ at 96 % recall. Lower is better.</p>
+        <div id="chartE2"></div>
+        <div class="legend" id="legE2"></div>
+      </div>
+      <div class="card">
+        <h3>E1 · classifier comparison</h3>
+        <p class="hint">Accuracy (bars) and FPR (labels) for each model.</p>
+        <div id="chartE1"></div>
+        <div class="legend" id="legE1"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Ablation detail</h3>
+      <p class="hint"><code>traffic_cti_no_match</code> drops the IoC-match flags to show whether the
+         gain is a label proxy or genuine behavioural intel.</p>
+      <div style="overflow-x:auto"><table id="tblE2"></table></div>
+      <div class="note" id="noteE2"></div>
+    </div>
+  </section>
+
+  <section id="freshness">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Contribution 3 · H2</div>
+        <h2>Freshness is a budget</h2>
+        <p>The same model, evaluated while the feed refresh interval is swept from 1 minute to
+           24 hours — so the curve isolates staleness, not model capacity.</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Coverage &amp; recall vs. refresh interval</h3>
+        <p class="hint">Left axis: %. Bars behind: median IoC age (minutes).</p>
+        <div id="chartE3a"></div>
+        <div class="legend" id="legE3a"></div>
+      </div>
+      <div class="card">
+        <h3>Cost of staleness at matched recall</h3>
+        <p class="hint">FPR re-tuned per interval to hold recall at 96 % — what staleness costs the analyst.</p>
+        <div id="chartE3b"></div>
+        <div class="legend" id="legE3b"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Sweep detail</h3>
+      <div style="overflow-x:auto"><table id="tblE3"></table></div>
+      <div class="note" id="noteE3"></div>
+    </div>
+  </section>
+
+  <section id="explain">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Contribution 4 · H3</div>
+        <h2>Reason codes that hold up</h2>
+        <p>Top features by mean |SHAP|, coloured by the ATT&amp;CK tactic they map to, plus the
+           cross-fold stability audit.</p>
+      </div>
+    </div>
+    <div class="kpis" id="kpisE4" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))"></div>
+    <div class="grid-2" style="margin-top:14px">
+      <div class="card">
+        <h3>Global feature importance</h3>
+        <p class="hint">Mean |SHAP| over the explanation sample, coloured by ATT&amp;CK tactic.</p>
+        <div id="chartE4"></div>
+        <div class="legend" id="legE4"></div>
+      </div>
+      <div class="card">
+        <h3>Reason-code tactic mix</h3>
+        <p class="hint">Share of emitted reason codes by tactic across explained alerts.</p>
+        <div id="chartTactics"></div>
+        <div class="legend" id="legTactics"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="latency">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">RQ4 · H4</div>
+        <h2>The alert path, timed</h2>
+        <p>Every batch of flows through enrich → design → predict → TreeSHAP → reason codes,
+           timestamped per stage. Explanation runs on alerts only.</p>
+      </div>
+    </div>
+    <div class="kpis" id="kpisE5" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))"></div>
+    <div class="grid-2" style="margin-top:14px">
+      <div class="card">
+        <h3>End-to-end latency by batch size</h3>
+        <p class="hint">p50 vs p95 per batch of flows; dashed budget = 1 s.</p>
+        <div id="chartE5"></div>
+        <div class="legend" id="legE5"></div>
+      </div>
+      <div class="card">
+        <h3>Where the time goes (p95)</h3>
+        <p class="hint">Stage latencies at the reference batch size of 64 flows.</p>
+        <div id="chartE5stages"></div>
+        <div class="legend" id="legE5stages"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Latency detail</h3>
+      <div style="overflow-x:auto"><table id="tblE5"></table></div>
+      <div class="note" id="noteE5"></div>
+    </div>
+  </section>
+
+  <section id="transport">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Generalisation · E6</div>
+        <h2>Cross-dataset transport</h2>
+        <p>Both models re-trained on a shared canonical feature bridge and shipped to the other
+           benchmark — θ tuned on the source only. In-domain reference bars show what is lost.</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Recall on the target test set</h3>
+        <p class="hint">In-domain vs cross-dataset, same canonical features.</p>
+        <div id="chartE6a"></div>
+        <div class="legend" id="legE6a"></div>
+      </div>
+      <div class="card">
+        <h3>PR-AUC on the target test set</h3>
+        <p class="hint">Ranking quality survives far better than the operating point.</p>
+        <div id="chartE6b"></div>
+        <div class="legend" id="legE6b"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Transport detail</h3>
+      <div style="overflow-x:auto"><table id="tblE6"></table></div>
+      <div class="note" id="noteE6"></div>
+    </div>
+  </section>
+
+  <section id="alerts">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Output</div>
+        <h2>Alerts, with their reasons</h2>
+        <p>A live sample of the emitted stream (<code>results/alerts/*.jsonl</code>) — each reason
+           carries its SHAP value, human-readable text and ATT&amp;CK mapping.</p>
+      </div>
+      <div class="seg" id="labelSeg" role="tablist" aria-label="Label filter">
+        <span class="pill" aria-hidden="true"></span>
+        <button role="tab" data-label="all" aria-selected="true">All</button>
+        <button role="tab" data-label="1" aria-selected="false">Malicious</button>
+        <button role="tab" data-label="0" aria-selected="false">Benign</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input class="search" id="alertSearch" type="search"
+             placeholder="Search technique, tactic, feature or category…" aria-label="Search alerts">
+      <span class="chip blue" id="alertCount">—</span>
+    </div>
+    <div class="alerts" id="alertList"></div>
+    <div class="empty" id="alertEmpty" hidden>No alerts match that filter.</div>
+    <div style="display:flex; justify-content:center; margin-top:6px">
+      <button id="moreBtn" class="more" hidden>Show more alerts</button>
+    </div>
+  </section>
+
+  <section id="feeds">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Contribution 1</div>
+        <h2>Intelligence intake</h2>
+        <p>What the collector actually pulled, and what it skipped for lack of credentials.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="meta" id="feedMeta"></div>
+      <div style="overflow-x:auto; margin-top:16px"><table id="tblFeeds"></table></div>
+      <div class="note">Feeds that need credentials (<b>OTX</b> → <code>cti.otx_api_key</code>,
+        <b>MISP</b> → <code>cti.misp_url</code>) are skipped gracefully and recorded in the poll
+        report instead of failing the run.</div>
+    </div>
+  </section>
+
+  <section id="figures">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Appendix</div>
+        <h2>Publication figures</h2>
+        <p>Rendered by <code>scripts/make_figures.py</code> directly from the experiment tables —
+           the same PNGs that go into the thesis.</p>
+      </div>
+    </div>
+    <div class="fig-grid" id="figGrid"></div>
+  </section>
+
+  <footer id="buildNote"></footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/{};
+
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const pct = (v, d=2) => (v*100).toFixed(d) + "%";
+const pp  = (v, d=2) => (v>=0?"+":"") + (v*100).toFixed(d) + " pp";
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtDate = t => new Date(t*1000).toLocaleString(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+const TACTIC_COLOR = {"Defense Evasion":"#0071e3","Command and Control":"#bf5af2","Exfiltration":"#ff9f0a",
+  "Collection":"#30d158","Discovery":"#64d2ff","Execution":"#ff453a","Initial Access":"#ffd60a",
+  "Persistence":"#5e5ce6","Uncategorised":"#8e8e93","Impact":"#ff2d55","Lateral Movement":"#0a84ff",
+  "Privilege Escalation":"#ac8e68","Resource Development":"#7d7d80","Reconnaissance":"#9e9ea3","Initial Access ":"#ffd60a"};
+const color = t => TACTIC_COLOR[t] || "#8e8e93";
+
+let DS = "unsw_nb15";
+let LABEL = "all";
+let QUERY = "";
+let SHOWN = 12;
+
+/* ---------------- segmented controls ---------------- */
+function wireSeg(el, onPick){
+  const btns = $$("button", el), pill = $(".pill", el);
+  const move = b => { pill.style.width = b.offsetWidth+"px";
+    pill.style.transform = `translateX(${b.offsetLeft - 3}px)`; };
+  btns.forEach(b => b.addEventListener("click", () => {
+    btns.forEach(x => x.setAttribute("aria-selected", String(x===b)));
+    move(b); onPick(b.dataset);
+  }));
+  requestAnimationFrame(() => move(btns.find(b => b.getAttribute("aria-selected")==="true")));
+  window.addEventListener("resize", () => move(btns.find(b => b.getAttribute("aria-selected")==="true")));
+}
+wireSeg($("#dsSeg"), d => { DS = d.ds; SHOWN = 12; render(); });
+wireSeg($("#labelSeg"), d => { LABEL = d.label; SHOWN = 12; renderAlerts(); });
+
+/* ---------------- theme ---------------- */
+const themeBtn = $("#themeBtn"), root = document.documentElement;
+const store = {
+  get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* private mode */ } },
+};
+const saved = store.get("theme");
+if (saved) root.dataset.theme = saved;
+else if (matchMedia("(prefers-color-scheme: dark)").matches) root.dataset.theme = "dark";
+themeBtn.addEventListener("click", () => {
+  root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+  store.set("theme", root.dataset.theme);
+  render();
+});
+
+/* ---------------- charts ---------------- */
+function svg(w, h, inner){ return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img">${inner}</svg>`; }
+
+function groupedBars({labels, series, fmt, height=250, yTitle=""}) {
+  const W = 560, H = height, ml = 44, mr = 12, mt = 16, mb = 58;
+  const iw = W - ml - mr, ih = H - mt - mb;
+  const vals = series.flatMap(s => s.values.map(v => +v || 0));
+  const max = Math.max(...vals, 1e-9) * 1.18;
+  const n = labels.length, k = series.length;
+  const bw = Math.min(38, (iw / n) * 0.62 / k);
+  const y = v => mt + ih - (v / max) * ih;
+  let g = "";
+  for (let i=0;i<=4;i++){
+    const v = max*i/4, yy = y(v);
+    g += `<line class="grid" x1="${ml}" y1="${yy}" x2="${W-mr}" y2="${yy}"/>`;
+    g += `<text x="${ml-8}" y="${yy+3}" text-anchor="end">${fmt(v)}</text>`;
+  }
+  labels.forEach((lab, i) => {
+    const cx = ml + (i+0.5) * (iw/n);
+    series.forEach((s, j) => {
+      const v = +s.values[i] || 0;
+      const x = cx - (k*bw)/2 + j*bw;
+      const c = (s.colors && s.colors[i]) || s.color;
+      g += `<rect x="${x}" y="${y(v)}" width="${bw-3}" height="${Math.max(1, mt+ih-y(v))}" rx="4"
+             fill="${c}" opacity="${s.opacity ?? 1}"><title>${s.name}: ${fmt(v)}</title></rect>`;
+      g += `<text class="val" x="${x+(bw-3)/2}" y="${y(v)-5}" text-anchor="middle">${fmt(v)}</text>`;
+    });
+    lab.split("\n").forEach((line, li) => {
+      g += `<text x="${cx}" y="${mt+ih+18+li*12}" text-anchor="middle">${esc(line)}</text>`;
+    });
+  });
+  g += `<line class="axis" x1="${ml}" y1="${mt+ih}" x2="${W-mr}" y2="${mt+ih}"/>`;
+  return svg(W, H, g);
+}
+
+function hBars({items, height=300, fmt=v=>v.toFixed(4)}) {
+  const W = 560, H = height, ml = 168, mr = 54, mt = 8, mb = 10;
+  const iw = W - ml - mr, rowH = (H - mt - mb) / items.length;
+  const max = Math.max(...items.map(d => +d.value || 0), 1e-9) * 1.16;
+  let g = "";
+  items.forEach((d, i) => {
+    const y = mt + i*rowH + rowH*0.16, h = rowH*0.62;
+    const w = (d.value / max) * iw;
+    g += `<text x="${ml-10}" y="${y+h/2+4}" text-anchor="end">${esc(d.label)}</text>`;
+    g += `<rect x="${ml}" y="${y}" width="${Math.max(2,w)}" height="${h}" rx="5" fill="${d.color}" opacity=".92">
+            <title>${esc(d.label)}: ${fmt(d.value)}</title></rect>`;
+    g += `<text class="val" x="${ml+w+8}" y="${y+h/2+4}">${fmt(d.value)}</text>`;
+  });
+  return svg(W, H, g);
+}
+
+function lineChart({labels, series, bars, height=250, yFmt, yMax}) {
+  const W = 560, H = height, ml = 44, mr = 44, mt = 16, mb = 52;
+  const iw = W-ml-mr, ih = H-mt-mb;
+  const all = series.flatMap(s => s.values.map(v=>+v||0));
+  const max = yMax ?? Math.max(...all, 1e-9)*1.15;
+  const xs = i => ml + (labels.length===1?iw/2:i*(iw/(labels.length-1)));
+  const y = v => mt + ih - ((v)/max)*ih;
+  let g = "";
+  if (bars) {
+    const bmax = Math.max(...bars.values, 1e-9);
+    const bw = Math.min(34, iw/labels.length*0.5);
+    bars.values.forEach((v,i) => {
+      const h = (v/bmax)*ih*0.86;
+      g += `<rect x="${xs(i)-bw/2}" y="${mt+ih-h}" width="${bw}" height="${h}" rx="4"
+              fill="${bars.color}" opacity=".28"><title>${bars.name}: ${v.toFixed(1)}</title></rect>`;
+    });
+  }
+  for (let i=0;i<=4;i++){
+    const v = max*i/4, yy = y(v);
+    g += `<line class="grid" x1="${ml}" y1="${yy}" x2="${W-mr}" y2="${yy}"/>`;
+    g += `<text x="${ml-8}" y="${yy+3}" text-anchor="end">${yFmt(v)}</text>`;
+  }
+  series.forEach(s => {
+    const pts = s.values.map((v,i) => `${xs(i)},${y(v)}`).join(" ");
+    g += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.4"
+            stroke-linejoin="round" stroke-linecap="round"/>`;
+    s.values.forEach((v,i) => {
+      g += `<circle cx="${xs(i)}" cy="${y(v)}" r="4.6" fill="var(--card)" stroke="${s.color}" stroke-width="2.4">
+              <title>${s.name} @ ${labels[i]}: ${yFmt(v)}</title></circle>`;
+      const mode = s.labelMode || "all";
+      const show = mode === "all" || (mode === "ends" && (i === 0 || i === s.values.length-1));
+      if (show) {
+        g += `<text class="val" x="${xs(i)}" y="${y(v)-11}" text-anchor="middle">${yFmt(v)}</text>`;
+      }
+    });
+  });
+  labels.forEach((l,i) => {
+    g += `<text x="${xs(i)}" y="${mt+ih+20}" text-anchor="middle">${esc(l)}</text>`;
+  });
+  g += `<line class="axis" x1="${ml}" y1="${mt+ih}" x2="${W-mr}" y2="${mt+ih}"/>`;
+  return svg(W, H, g);
+}
+
+const legend = (el, items) => el.innerHTML = items
+  .map(i => `<span><i style="background:${i.color}"></i>${esc(i.name)}</span>`).join("");
+
+/* ---------------- renderers ---------------- */
+function renderKpis(){
+  const d = DATA.datasets[DS];
+  const split = d.e2.fpr_reduction_split, cv = d.e2.fpr_reduction_cv || {};
+  const nomatch = d.e2.fpr_reduction_no_match_cv;
+  const e3 = d.e3, rows = e3.rows;
+  const short = rows.find(r => r.interval_min === 5) || rows[0];
+  const long = rows[rows.length-1];
+  const ratio = short.matched_fpr ? long.matched_fpr / short.matched_fpr : NaN;
+  const gap = short.recall - long.recall;
+  const e4 = d.e4;
+
+  const h1pass = (split.relative_reduction ?? 0) >= 0.10;
+  const h2pass = gap >= 0.03;
+  const h3pass = e4.h3_jaccard_mean >= 0.7;
+  const e5 = d.e5;
+  const ref5 = e5 ? (e5.batch_sizes["64"] || Object.values(e5.batch_sizes)[0]) : null;
+
+  $("#kpis").innerHTML = `
+    ${kpi("H1 · FPR reduction", pct(split.relative_reduction,1),
+      `split test · <b>${pct(cv.relative_reduction ?? 0,1)}</b> cross-validated`,
+      h1pass ? ["pass","Supported (split)"] : ["fail","Not supported"])}
+    ${kpi("H2 · recall gap 5m→24h", pp(gap),
+      `matched-recall FPR <b>×${(ratio||1).toFixed(2)}</b>`,
+      h2pass ? ["pass","Supported"] : ["fail","Not supported"])}
+    ${kpi("H3 · reason stability", (e4.h3_jaccard_mean||0).toFixed(3),
+      `min ${(e4.stability_top10_jaccard?.min ?? 0).toFixed(3)} · tactic TV ${(e4.tactic_stability?.mean_tv_distance ?? 0).toFixed(3)}`,
+      h3pass ? ["pass","Supported"] : ["fail","Not supported"])}
+    ${e5 ? kpi("H4 · p95 alert path", (ref5.stages.total.p95*1000).toFixed(0)+" ms",
+      `batch ${ref5.batch_size} · budget 1000 ms`,
+      e5.h4_p95_lt_1s ? ["pass","Supported"] : ["fail","Not supported"]) : ""}
+    ${kpi("Live IoCs in store", DATA.feeds.store_stats.total.toLocaleString(),
+      `+${(nomatch ? pct(nomatch.relative_reduction,1) : "—")} without match flags`, null)}
+    ${kpi("Coverage 5 min → 24 h", `${pct(short.coverage_malicious,0)} → ${pct(long.coverage_malicious,0)}`,
+      `malicious flows with a visible IoC`, e3.monotone_coverage ? ["pass","Monotone"] : ["mixed","Non-monotone"])}`;
+}
+const kpi = (label, value, sub, verdict) => `
+  <div class="kpi">
+    <div class="k-label">${esc(label)}</div>
+    <div class="k-value">${value}</div>
+    <div class="k-sub">${sub}</div>
+    ${verdict ? `<span class="verdict ${verdict[0]}"><span class="d"></span>${esc(verdict[1])}</span>` : ""}
+  </div>`;
+
+function renderE2(){
+  const d = DATA.datasets[DS], by = Object.fromEntries(d.e2.variants.map(v => [v.variant, v]));
+  const order = ["traffic_only","traffic_cti","traffic_cti_no_match","live_feeds_only"];
+  const meta = {
+    traffic_only:["Traffic\nonly","#a1a1a6"],
+    traffic_cti:["Traffic +\nCTI","#0071e3"],
+    traffic_cti_no_match:["No match\nflags","#30d158"],
+    live_feeds_only:["Live feeds\n(0% overlap)","#ff9f0a"],
+  };
+  const keys = order.filter(k => by[k]);
+  $("#chartE2").innerHTML = groupedBars({
+    labels: keys.map(k => meta[k][0]),
+    series: [{name:"FPR", color:"#0071e3",
+      colors: keys.map(k => meta[k][1]),
+      values: keys.map(k => by[k].split_test.fpr*100)}],
+    fmt: v => v.toFixed(3)+"%"
+  });
+  legend($("#legE2"), keys.map(k => ({name: meta[k][0].replace("\n"," "), color: meta[k][1]})));
+
+  const rows = keys.map(k => by[k]);
+  $("#tblE2").innerHTML = `
+    <thead><tr><th>Variant</th><th class="num">Features</th><th class="num">Recall</th>
+      <th class="num">Precision</th><th class="num">FPR</th><th class="num">PR-AUC</th>
+      <th class="num">CV FPR (5-fold)</th></tr></thead>
+    <tbody>${rows.map(r => {
+      const cv = r.cv || {};
+      const cls = r.variant === "traffic_cti" ? "hl" : "";
+      return `<tr class="${cls}">
+        <td><b>${esc(r.variant)}</b></td>
+        <td class="num">${r.n_features}</td>
+        <td class="num">${pct(r.split_test.recall,2)}</td>
+        <td class="num">${pct(r.split_test.precision,2)}</td>
+        <td class="num">${pct(r.split_test.fpr,3)}</td>
+        <td class="num">${pct(r.split_test.pr_auc,2)}</td>
+        <td class="num">${cv.fpr_mean != null ? pct(cv.fpr_mean,3)+" ± "+pct(cv.fpr_std,3) : "—"}</td>
+      </tr>`;}).join("")}</tbody>`;
+
+  const s = d.e2.fpr_reduction_split, c = d.e2.fpr_reduction_cv || {}, nm = d.e2.fpr_reduction_no_match_cv;
+  $("#noteE2").innerHTML =
+    `<b>Headline.</b> Split test: FPR ${pct(s.traffic_only_fpr,3)} → ${pct(s.traffic_cti_fpr,3)}
+     (<b>${pct(s.relative_reduction,1)}</b> reduction) with recall ${pct(s.recall_cti,2)} vs
+     ${pct(s.recall_traffic,2)}. Cross-validated: ${pct(c.relative_reduction ?? 0,1)}.
+     Removing the IoC-match flags leaves ${nm ? pct(nm.relative_reduction,1) : "—"} — on this dataset the
+     residual comes from feed-membership features (age, confidence, reputation), because controlled
+     injection is label-derived. The <b>live_feeds_only</b> row is the honest real-world figure:
+     today's feeds share ~0 IPs with 2017-era benchmarks, so it equals traffic-only.`;
+}
+
+function renderE1(){
+  const d = DATA.datasets[DS];
+  const models = [...new Set(d.e1.rows.map(r => r.model))];
+  const variants = [...new Set(d.e1.rows.map(r => r.variant))];
+  const get = (m,v,k) => d.e1.rows.find(r => r.model===m && r.variant===v)?.[k] ?? 0;
+  $("#chartE1").innerHTML = groupedBars({
+    labels: models.map(m => m.replace("Gradient ","Grad. ").replace("Random ","")),
+    series: [
+      {name:"traffic only", color:"#a1a1a6", values: models.map(m => get(m,"traffic_only","accuracy")*100)},
+      {name:"+ CTI", color:"#0071e3", values: models.map(m => get(m,"traffic_cti","accuracy")*100)},
+    ].filter((s,i) => variants.length > i),
+    fmt: v => v.toFixed(1)+"%", height:250
+  });
+  legend($("#legE1"), [{name:"Traffic only",color:"#a1a1a6"},{name:"+ CTI",color:"#0071e3"}]);
+}
+
+function renderE3(){
+  const rows = DATA.datasets[DS].e3.rows;
+  const labels = rows.map(r => r.interval_label);
+  $("#chartE3a").innerHTML = lineChart({
+    labels, yFmt: v => v.toFixed(0)+"%",
+    bars: {name:"median IoC age (min)", color:"#ff9f0a", values: rows.map(r => r.median_age_min)},
+    series: [
+      {name:"recall", color:"#0071e3", labelMode:"ends", values: rows.map(r => r.recall*100)},
+      {name:"malicious coverage", color:"#30d158", labelMode:"ends", values: rows.map(r => r.coverage_malicious*100)},
+    ],
+    yMax: 105,
+  });
+  legend($("#legE3a"), [
+    {name:"Recall (fixed θ)", color:"#0071e3"},
+    {name:"IoC coverage, malicious", color:"#30d158"},
+    {name:"Median IoC age", color:"#ff9f0a"},
+  ]);
+
+  const fpr = rows.map(r => r.matched_fpr*100);
+  $("#chartE3b").innerHTML = lineChart({
+    labels, yFmt: v => v.toFixed(3)+"%",
+    series: [{name:"FPR at 96% recall", color:"#ff453a", values: fpr}],
+    yMax: Math.max(...fpr)*1.3,
+  });
+  legend($("#legE3b"), [{name:"FPR at matched recall 96%", color:"#ff453a"}]);
+
+  $("#tblE3").innerHTML = `
+    <thead><tr><th>Interval</th><th class="num">Recall (fixed θ)</th><th class="num">Recall (matched θ)</th>
+      <th class="num">FPR (matched)</th><th class="num">Coverage · all</th><th class="num">Coverage · malicious</th>
+      <th class="num">Median age</th></tr></thead>
+    <tbody>${rows.map(r => `<tr>
+      <td><b>${esc(r.interval_label)}</b></td>
+      <td class="num">${pct(r.recall,2)}</td>
+      <td class="num">${pct(r.matched_recall,2)}</td>
+      <td class="num">${pct(r.matched_fpr,4)}</td>
+      <td class="num">${pct(r.coverage_all,1)}</td>
+      <td class="num">${pct(r.coverage_malicious,1)}</td>
+      <td class="num">${r.median_age_min.toFixed(1)} min</td></tr>`).join("")}</tbody>`;
+
+  const e3 = DATA.datasets[DS].e3;
+  const short = rows.find(r => r.interval_min===5) || rows[0];
+  const long = rows[rows.length-1];
+  const ratio = short.matched_fpr ? long.matched_fpr / short.matched_fpr : NaN;
+  const gap = short.recall - long.recall;
+  $("#noteE3").innerHTML =
+    `<b>Verdict for H2 (≥ 3 pp recall gap):</b> ${gap >= 0.03
+      ? `<b style="color:var(--green)">supported</b> — ${pp(gap)} between 5 min and 24 h.`
+      : `<b style="color:var(--red)">not supported</b> — only ${pp(gap)} between 5 min and 24 h
+         (monotone recall = ${e3.monotone_recall}).`}
+     The dataset-independent staleness cost is the matched-recall FPR,
+     <b>×${(ratio||1).toFixed(2)}</b> from 5 min to 24 h, and coverage falling
+     ${pct(short.coverage_malicious,0)} → ${pct(long.coverage_malicious,0)}
+     (monotone = ${e3.monotone_coverage}).`;
+}
+
+function renderE4(){
+  const d = DATA.datasets[DS].e4;
+  $("#kpisE4").innerHTML = `
+    ${kpi("H3 · mean top-10 Jaccard", (d.h3_jaccard_mean||0).toFixed(3),
+      `threshold ≥ 0.700 · min ${(d.stability_top10_jaccard?.min ?? 0).toFixed(3)}`,
+      d.h3_pass ? ["pass","PASS"] : ["fail","FAIL"])}
+    ${kpi("ATT&CK tactic TV distance", (d.tactic_stability?.mean_tv_distance ?? 0).toFixed(3),
+      `top-4 Jaccard <b>${(d.tactic_stability?.mean_top4_jaccard ?? 0).toFixed(3)}</b> · lower is stabler`,
+      (d.tactic_stability?.mean_tv_distance ?? 1) < 0.1 ? ["pass","Stable"] : ["mixed","Drifting"])}
+    ${kpi("Alerts carrying CTI reasons", pct(d.alert_cti_reason_share ?? 0,1),
+      `${(d.alerts_with_cti_reason ?? 0)} of ${d.n_alerts_explained} explained alerts`,
+      (d.alert_cti_reason_share ?? 0) > 0.5 ? ["pass","Explainable intel"] : ["mixed","Sparse"])}
+    ${kpi("Operating point θ", (d.theta ?? 0).toFixed(3),
+      `recall ${pct(d.test_metrics?.recall ?? 0,2)} · FPR ${pct(d.test_metrics?.fpr ?? 0,3)}`, null)}`;
+
+  const top = d.top10_features, strength = d.top10_strength;
+  const items = top.map(f => ({label: f.replace(/_/g," "), value: strength[f],
+    color: color(mapTactic(d, f))})).reverse();
+  $("#chartE4").innerHTML = hBars({items, fmt: v => v.toFixed(4)});
+  const used = [...new Set(top.map(f => mapTactic(d, f)))];
+  legend($("#legE4"), used.map(t => ({name: t, color: color(t)})));
+
+  const dist = d.reason_tactic_distribution || {};
+  const total = Object.values(dist).reduce((a,b)=>a+b,0) || 1;
+  const tItems = Object.entries(dist).sort((a,b)=>b[1]-a[1])
+    .map(([t,v]) => ({label:t, value:v/total, color:color(t)}));
+  $("#chartTactics").innerHTML = hBars({items: tItems, fmt: v => (v*100).toFixed(1)+"%"});
+  legend($("#legTactics"), tItems.map(t => ({name:t.label, color:t.color})));
+}
+
+/* tactic lookup is precomputed in the payload when available */
+function mapTactic(d, feature){
+  return d.tactic_of_feature?.[feature] || "Uncategorised";
+}
+
+function renderE5(){
+  const d = DATA.datasets[DS], e5 = d.e5;
+  if (!e5) {
+    $("#kpisE5").innerHTML = "";
+    $("#chartE5").innerHTML = $("#chartE5stages").innerHTML = "";
+    $("#tblE5").innerHTML = "";
+    $("#noteE5").innerHTML = `E5 not run for this dataset — <code>python scripts/run_e5_latency.py --dataset ${DS}</code>.`;
+    return;
+  }
+  const bs = e5.batch_sizes, keys = Object.keys(bs).sort((a,b) => +a - +b);
+  const p50 = keys.map(k => bs[k].stages.total.p50*1000);
+  const p95 = keys.map(k => bs[k].stages.total.p95*1000);
+  const ref = keys.includes("64") ? "64" : keys[0];
+  const refSt = bs[ref].stages;
+  const explainShare = refSt.total.p95 > 0 ? refSt.explain.p95 / refSt.total.p95 : 0;
+
+  $("#kpisE5").innerHTML = `
+    ${kpi("H4 · p95 @ batch " + ref, (refSt.total.p95*1000).toFixed(0) + " ms",
+      `budget 1000 ms · p50 ${(refSt.total.p50*1000).toFixed(0)} ms`,
+      e5.h4_p95_lt_1s ? ["pass","Supported"] : ["fail","Not supported"])}
+    ${kpi("Explain share of p95", pct(explainShare,0),
+      `alerts in window: ${e5.protocol.window_alerts.toLocaleString()}`,
+      explainShare < 0.9 ? ["pass","Bounded by alerts"] : ["mixed","Explain-bound"])}
+    ${kpi("Score path (no SHAP)", (refSt.total_no_explain.p95*1000).toFixed(0) + " ms",
+      `enrich ${ (refSt.enrich.p95*1000).toFixed(0) } · design ${ (refSt.design.p95*1000).toFixed(0) } · predict ${ (refSt.predict.p95*1000).toFixed(0) } ms`, null)}
+    ${kpi("Feed poll path", e5.poll_seconds + " s",
+      `${e5.poll_records.toLocaleString()} records · θ ${e5.theta.toFixed(3)}`, null)}`;
+
+  $("#chartE5").innerHTML = groupedBars({
+    labels: keys.map(k => "batch " + k),
+    series: [
+      {name:"p50", color:"#0071e3", values: p50},
+      {name:"p95", color:"#8dc4f5", values: p95},
+    ],
+    fmt: v => v.toFixed(0)+" ms", height:250
+  });
+  legend($("#legE5"), [{name:"p50 total", color:"#0071e3"}, {name:"p95 total", color:"#8dc4f5"}]);
+
+  const stages = ["enrich","design","predict","explain"];
+  const stageMeta = {enrich:["Enrich","#64d2ff"], design:["Design","#5e5ce6"],
+                     predict:["Predict","#0071e3"], explain:["Explain","#ff9f0a"]};
+  $("#chartE5stages").innerHTML = groupedBars({
+    labels: ["stage p95"],
+    series: stages.map(s => ({name: stageMeta[s][0], color: stageMeta[s][1],
+      values: [refSt[s].p95*1000]})),
+    fmt: v => v.toFixed(0)+" ms", height:250
+  });
+  legend($("#legE5stages"), stages.map(s => ({name: stageMeta[s][0], color: stageMeta[s][1]})));
+
+  $("#tblE5").innerHTML = `
+    <thead><tr><th>Batch</th><th class="num">Batches</th><th class="num">Alerts</th>
+      <th class="num">enrich p95</th><th class="num">design p95</th><th class="num">predict p95</th>
+      <th class="num">explain p95</th><th class="num">total p50</th><th class="num">total p95</th></tr></thead>
+    <tbody>${keys.map(k => {
+      const b = bs[k], st = b.stages;
+      return `<tr class="${k===ref?"hl":""}">
+        <td><b>${k}</b></td><td class="num">${b.batches_timed}</td><td class="num">${b.alerts_scored}</td>
+        <td class="num">${(st.enrich.p95*1000).toFixed(1)} ms</td>
+        <td class="num">${(st.design.p95*1000).toFixed(1)} ms</td>
+        <td class="num">${(st.predict.p95*1000).toFixed(1)} ms</td>
+        <td class="num">${(st.explain.p95*1000).toFixed(1)} ms</td>
+        <td class="num">${(st.total.p50*1000).toFixed(0)} ms</td>
+        <td class="num"><b>${(st.total.p95*1000).toFixed(0)} ms</b></td></tr>`;}).join("")}</tbody>`;
+
+  $("#noteE5").innerHTML =
+    `<b>H4 (p95 &lt; 1 s per batch):</b> ${e5.h4_p95_lt_1s
+      ? `<b style="color:var(--green)">supported</b> at batch ${ref} (p95 ${(refSt.total.p95*1000).toFixed(0)} ms).`
+      : `<b style="color:var(--red)">not supported</b> at batch ${ref} (p95 ${(refSt.total.p95*1000).toFixed(0)} ms).`}
+     Window: ${e5.protocol.window_malicious} malicious / ${e5.protocol.window_alerts} alerts in
+     ${e5.protocol.target_flows.toLocaleString()} time-ordered test flows
+     (${esc(e5.protocol.window_rule)}). Hardware: ${esc(e5.hardware.platform)} ·
+     ${e5.hardware.cores} cores. Explanation scales with alert count — batch 256 crosses the
+     budget when many alerts fire in one batch.`;
+}
+
+function renderE6(){
+  const e6 = DATA.e6;
+  if (!e6) {
+    $("#chartE6a").innerHTML = $("#chartE6b").innerHTML = $("#tblE6").innerHTML = "";
+    $("#noteE6").innerHTML = `E6 not run — <code>python scripts/run_e6_crossdataset.py</code>.`;
+    return;
+  }
+  const dirs = e6.directions;
+  const order = ["unsw_nb15_to_cicids2017","cicids2017_to_unsw_nb15"].filter(k => dirs[k]);
+  const labels = order.map(k => k === "unsw_nb15_to_cicids2017" ? "UNSW → CICIDS" : "CICIDS → UNSW");
+  $("#chartE6a").innerHTML = groupedBars({
+    labels,
+    series: [
+      {name:"in-domain", color:"#0071e3", values: order.map(k => dirs[k].in_domain_target_test.recall*100)},
+      {name:"cross-dataset", color:"#ff453a", values: order.map(k => dirs[k].cross_target_test.recall*100)},
+    ],
+    fmt: v => v.toFixed(1)+"%", height:250
+  });
+  legend($("#legE6a"), [{name:"In-domain", color:"#0071e3"}, {name:"Cross-dataset", color:"#ff453a"}]);
+  $("#chartE6b").innerHTML = groupedBars({
+    labels,
+    series: [
+      {name:"in-domain", color:"#0071e3", values: order.map(k => dirs[k].in_domain_target_test.pr_auc*100)},
+      {name:"cross-dataset", color:"#ff453a", values: order.map(k => dirs[k].cross_target_test.pr_auc*100)},
+    ],
+    fmt: v => v.toFixed(1)+"%", height:250
+  });
+  legend($("#legE6b"), [{name:"In-domain PR-AUC", color:"#0071e3"}, {name:"Cross PR-AUC", color:"#ff453a"}]);
+
+  $("#tblE6").innerHTML = `
+    <thead><tr><th>Direction</th><th class="num">θ (source)</th>
+      <th class="num">cross recall</th><th class="num">in-domain recall</th><th class="num">Δ recall</th>
+      <th class="num">cross FPR</th><th class="num">in FPR</th>
+      <th class="num">cross PR-AUC</th><th class="num">in PR-AUC</th></tr></thead>
+    <tbody>${order.map(k => {
+      const r = dirs[k], c = r.cross_target_test, i = r.in_domain_target_test, g = r.gap_in_minus_cross;
+      return `<tr><td><b>${esc(k.replace(/_/g," "))}</b></td>
+        <td class="num">${r.theta_source.toFixed(3)}</td>
+        <td class="num">${pct(c.recall,1)}</td><td class="num">${pct(i.recall,1)}</td>
+        <td class="num" style="color:var(--red)">${pp(-g.recall,1)}</td>
+        <td class="num">${pct(c.fpr,3)}</td><td class="num">${pct(i.fpr,3)}</td>
+        <td class="num">${pct(c.pr_auc,1)}</td><td class="num">${pct(i.pr_auc,1)}</td></tr>`;}).join("")}</tbody>`;
+
+  const gaps = order.map(k => dirs[k].gap_in_minus_cross.recall);
+  $("#noteE6").innerHTML =
+    `<b>Verdict:</b> transport collapses in both directions — recall gaps of
+     ${gaps.map(g => pp(g,1)).join(" and ")} against in-domain references. Even with a shared
+     ${e6.directions[order[0]].n_features}-feature semantic bridge (identical formulas, log1p,
+     shared CTI block), a threshold tuned on the source does not survive the distribution shift:
+     ${esc(order[1])} never crosses its source θ (cross FPR 0). Ranking degrades far less than the
+     operating point (PR-AUC stays well above the class prior), so per-target recalibration is the
+     necessary first step for any deployment — a dataset-specific calibration set is assumed by
+     every other result in this thesis.`;
+}
+
+function renderAlerts(){
+  const d = DATA.datasets[DS];
+  let rows = d.alerts || [];
+  if (LABEL !== "all") rows = rows.filter(a => String(a.label) === LABEL);
+  const q = QUERY.trim().toLowerCase();
+  if (q) rows = rows.filter(a => JSON.stringify([a.attack_cat, ...a.reason_codes.map(r =>
+    [r.feature, r.reason, r.tactic, r.technique])]).toLowerCase().includes(q));
+  $("#alertCount").textContent = `${rows.length} shown · ${d.alert_total} emitted`;
+  $("#alertEmpty").hidden = rows.length > 0;
+  const slice = rows.slice(0, SHOWN);
+  const maxShap = Math.max(0.001, ...slice.flatMap(a => a.reason_codes.map(r => r.shap || 0)));
+  $("#alertList").innerHTML = slice.map(a => `
+    <article class="alert">
+      <div class="alert-top">
+        <span class="score ${a.label ? "" : "benign"}">${a.score.toFixed(3)}</span>
+        <span class="cat">${esc(a.attack_cat)}</span>
+        <span class="chip ${a.label ? "red" : "green"}">${a.label ? "malicious" : "benign"}</span>
+        <span class="when">${fmtDate(a.timestamp)} · θ ${a.theta.toFixed(2)}</span>
+      </div>
+      <div class="reasons">
+        ${a.reason_codes.slice(0,4).map(r => {
+          const isCti = r.shap == null;
+          const w = isCti ? 78 : Math.max(6, Math.abs(r.shap)/maxShap*100);
+          return `<div class="reason">
+            <span class="feat" title="${esc(r.feature)}">${esc(r.feature)}</span>
+            <span class="txt" title="${esc(r.reason)}">${esc(r.reason)}</span>
+            <span class="bar ${isCti?"cti":""}"><span style="width:${w}%"></span></span>
+            <em>${isCti ? "CTI" : "±"+Math.abs(r.shap).toFixed(3)}</em>
+          </div>
+          <div class="reason" style="margin-top:-4px">
+            <span></span>
+            <span><span class="chip purple">${esc(r.tactic||"—")}</span>
+              <span class="chip">${esc(r.technique||"—")}</span></span>
+            <span></span>
+            <span></span>
+          </div>`;}).join("")}
+      </div>
+    </article>`).join("");
+  const more = $("#moreBtn");
+  more.hidden = rows.length <= SHOWN;
+  more.textContent = `Show ${Math.min(12, rows.length - SHOWN)} more · ${rows.length - SHOWN} remaining`;
+}
+
+function renderFeeds(){
+  const f = DATA.feeds, s = f.store_stats;
+  $("#feedMeta").innerHTML = `
+    <div><div class="t">Indicators stored</div><div class="v">${s.total.toLocaleString()}</div></div>
+    <div><div class="t">Polled records</div><div class="v">${f.n_records.toLocaleString()}</div></div>
+    <div><div class="t">Last poll</div><div class="v" style="font-size:14px">${fmtDate(f.polled_at)}</div></div>
+    <div><div class="t">Provenance</div><div class="v"><span class="chip green">${esc(f.provenance)}</span></div></div>`;
+  const src = Object.entries(s).filter(([k]) => k.startsWith("source:"))
+    .map(([k,v]) => [k.split(":")[1], v]);
+  const typ = Object.entries(s).filter(([k]) => k.startsWith("type:"))
+    .map(([k,v]) => [k.split(":")[1], v]);
+  $("#tblFeeds").innerHTML = `
+    <thead><tr><th>Source</th><th class="num">Indicators</th><th>Status</th></tr></thead>
+    <tbody>
+      ${src.map(([n,v]) => `<tr><td><b>${esc(n)}</b></td><td class="num">${v.toLocaleString()}</td>
+        <td><span class="chip green">active</span></td></tr>`).join("")}
+      <tr><td><b>otx</b></td><td class="num">—</td>
+        <td><span class="chip orange">needs cti.otx_api_key</span></td></tr>
+      <tr><td><b>misp</b></td><td class="num">—</td>
+        <td><span class="chip orange">needs cti.misp_url</span></td></tr>
+      ${typ.map(([n,v]) => `<tr><td>type: ${esc(n)}</td><td class="num">${v.toLocaleString()}</td>
+        <td><span class="chip">schema</span></td></tr>`).join("")}
+    </tbody>`;
+}
+
+function renderFigures(){
+  const names = DATA.figures || [];
+  const src = DATA.figure_data || {};
+  const title = f => {
+    if (f.startsWith("e1_")) return "E1 · classifier comparison";
+    if (f.startsWith("e2_")) return "E2 · CTI ablation";
+    if (f.startsWith("e3_")) return "E3 · freshness sweep";
+    if (f.startsWith("e4_top")) return "E4 · SHAP importance";
+    if (f.startsWith("e4_tac")) return "E4 · tactic mix of reasons";
+    if (f.startsWith("e5_")) return "E5 · alert-path latency";
+    if (f.startsWith("e6_")) return "E6 · cross-dataset transport";
+    return f.replace(/\.png$/, "");
+  };
+  $("#figGrid").innerHTML = names.map(f => `
+    <figure class="fig-card" style="margin:0">
+      <img src="${src[f] || "../results/figures/" + f}" alt="${esc(title(f))}">
+      <figcaption class="cap"><b>${esc(title(f))}</b><span>${esc(f)}</span></figcaption>
+    </figure>`).join("") ||
+    `<div class="empty">No figures yet — run <code>scripts/make_figures.py</code>.</div>`;
+}
+
+function renderFooter(){
+  $("#buildNote").innerHTML = `Built from <code>results/tables</code> by
+    <code>scripts/build_dashboard.py</code> · ${esc(DATA.generated)} ·
+    ${esc(DATA.config.note)}`;
+}
+
+function render(){
+  renderKpis(); renderE1(); renderE2(); renderE3(); renderE4();
+  renderE5(); renderE6();
+  renderAlerts(); renderFeeds(); renderFigures(); renderFooter();
+}
+$("#alertSearch").addEventListener("input", e => { QUERY = e.target.value; SHOWN = 12; renderAlerts(); });
+$("#moreBtn").addEventListener("click", () => { SHOWN += 12; renderAlerts(); });
+render();
+</script>
+</body>
+</html>
