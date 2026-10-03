@@ -1,0 +1,68 @@
+# APT-CTI scoring service configuration (paths relative to the repo root)
+
+bundle: model/deploy_live_netflow.joblib   # or model/deploy_unsw_full.joblib
+
+input:
+  path: data/inbox/flows.jsonl             # file the sensor/forwarder appends to
+  format: auto                             # auto | jsonl | csv | zeek | eve
+  start_at_end: true                       # false = score the file from the start
+
+batch:
+  max_flows: 64                            # E5's production-representative batch
+  flush_s: 5.0                             # also flush when the batch is still small
+
+feeds:
+  online: true                             # poll live intel feeds every 5 min
+  sources: [urlhaus, threatfox, feodo,     # 10 keyless feeds (all plain text);
+            binarydefense, emerging, cins, # otx/misp available after setting
+            blocklist, ipsum, openphish,   # cti.otx_api_key / misp_* keys in
+            certpl]                        # config/default.yaml
+  poll_interval_min: 5
+  ttl_hours: 168.0
+  half_life_h: 6.0
+  snapshot_dir: data/feed_snapshots        # offline corpus used when online=false
+
+alerts:
+  jsonl: deploy/alerts/alerts.jsonl        # local alert log ("" disables)
+  rotate_mb: 50.0                          # rotate the alert log at this size
+  keep_files: 8                            # archives retained (newest-first)
+  audit_log: deploy/audit.log              # auth + AI-explain audit trail
+  webhook_url: ""                          # POST each alert, https:// recommended
+  webhook_token: ""                        # optional Authorization: Bearer <token>
+  syslog_host: ""                          # UDP syslog collector host
+  syslog_port: 514
+  top_k_reasons: 3
+
+auth:
+  token: ""                                # shared secret for the web API
+                                            # (Authorization: Bearer <token> or
+                                            # ?token= / X-Auth-Token).
+                                            # EMPTY = loopback-only: binding
+                                            # health.host to a non-loopback
+                                            # address without a token refuses
+                                            # to start (fail closed).
+  explain_per_min: 12                      # /api/explain rate limit (0 = off)
+
+health:
+  host: 127.0.0.1                          # keep 127.0.0.1 unless auth.token set
+  port: 8099                               # GET /__status, web UI at /
+
+xai:
+  # NVIDIA NIM analyst brief per alert ("Explain with AI" in the web UI).
+  # Preferred: set NVIDIA_API_KEY in the environment, then restart the service.
+  # Fallback: paste the key into api_key (never commit it to git).
+  # Privacy: flow fields + SHAP reasons are sent to the API when you click.
+  api_key: ""
+  base_url: https://integrate.api.nvidia.com/v1
+  model: openai/gpt-oss-20b               # must be active on GET /v1/models (retired ids → 410)
+  timeout_s: 60
+  reasoning_effort: low                   # gpt-oss reasons; low = brief + fast
+
+attribution:
+  # APT candidate attribution per alert (offline: local corpus + TF-IDF model).
+  # verdict apt-attributed (notify) needs technique overlap + IoC corroboration;
+  # otherwise apt-candidate, or not-apt + behavioural category fallback.
+  enabled: true
+  top_k: 5                                 # candidates reported per alert
+  min_score: 0.15                          # below this = not-apt + category
+  min_notify: 0.25                         # notify threshold (with corroboration)
