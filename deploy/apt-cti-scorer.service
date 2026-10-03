@@ -1,0 +1,56 @@
+# APT-CTI scoring service — systemd unit (production, Linux)
+#
+# Install (as root):
+#   cp deploy/apt-cti-scorer.service /etc/systemd/system/
+#   mkdir -p /opt/apt-cti-thesis && cp -r <repo>/. /opt/apt-cti-thesis/
+#   useradd -r -s /usr/sbin/nologin aptcti
+#   chown -R aptcti:aptcti /opt/apt-cti-thesis/data /opt/apt-cti-thesis/deploy/alerts
+#   cat > /etc/default/apt-cti-scorer <<'EOF'
+#   APT_CTI_TOKEN=<strong-token>
+#   NVIDIA_API_KEY=nvapi-...
+#   EOF
+#   chmod 600 /etc/default/apt-cti-scorer
+#   systemctl daemon-reload && systemctl enable --now apt-cti-scorer
+#
+# Fail-closed: health.host must stay 127.0.0.1 unless APT_CTI_TOKEN is set;
+# put a TLS reverse proxy (nginx/caddy) in front for remote access.
+
+[Unit]
+Description=APT-CTI real-time scoring service
+Documentation=file:///opt/apt-cti-thesis/deploy/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/apt-cti-thesis
+EnvironmentFile=-/etc/default/apt-cti-scorer
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/apt-cti-thesis/.venv/bin/python deploy/service.py --config deploy/config.yaml
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+User=aptcti
+Group=aptcti
+
+# --- hardening ---------------------------------------------------------
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/apt-cti-thesis/data /opt/apt-cti-thesis/deploy
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
