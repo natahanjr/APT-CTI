@@ -1,0 +1,41 @@
+# Default experiment configuration.
+# Any field here overrides the dataclass defaults in src/cti_pipeline/config.py
+
+data:
+  unsw_dir: "C:/Users/Haaraphel/IDS_PROJECT/data"
+  cic_dir: "data/cicids2017/raw"
+  datasets: [unsw_nb15, cicids2017]
+  max_rows: 400000      # stratified subsample cap (0 = keep everything)
+  test_size: 0.2
+  val_size: 0.2
+
+cti:
+  feeds: [urlhaus, threatfox, feodo, otx, misp]
+  poll_interval_min: 5  # reference refresh interval used for training features
+  ttl_hours: 168        # indicator expires after 7 days without a sighting
+  freshness_half_life_h: 6
+  db_path: "data/ioc_store.db"
+  snapshot_dir: "data/feed_snapshots"
+  otx_api_key: ""       # optional - https://otx.alienvault.com/api
+  misp_url: ""          # optional - https://<instance>/ with API key below
+  misp_key: ""
+  request_timeout_s: 30
+
+replay:
+  intervals_min: [1, 5, 60, 360, 1440]   # 1 min, 5 min, 1 hr, 6 hr, 24 hr
+  injection: controlled  # controlled (ground-truth IoCs) | none (live feeds only)
+  injection_rate: 0.6    # share of malicious-flow IPs published as IoCs
+  benign_ioc_rate: 0.004 # feed noise: share of benign-only IPs flagged
+  ttl_hours: 168
+  freshness_half_life_h: 6
+  seed: 42
+
+model:
+  n_estimators: 200
+  min_samples_leaf: 20   # regularisation; keeps TreeSHAP tractable for E4
+  n_jobs: -1
+  target_recall: 0.96    # matched-recall operating point for H1
+  cv_folds: 5
+  shap_sample: 4000
+  top_k_reasons: 3
+  seed: 42
