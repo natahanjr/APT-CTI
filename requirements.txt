@@ -1,0 +1,13 @@
+# Live-CTI enrichment pipeline for freshness-aware APT prediction
+# Python 3.13, CPU-only (16 GB RAM laptop target)
+
+numpy>=2.0,<2.5
+pandas>=2.2
+pyarrow>=17
+scikit-learn>=1.5
+matplotlib>=3.9
+scipy>=1.13
+shap>=0.46
+numba>=0.60
+requests>=2.32
+PyYAML>=6.0
