@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Secrets / env
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+
+# Logs
+logs/
+*.log
+*.err
+
+# Large datasets & local artifacts (keep code, not bulk data)
+data/cicids2017/
+data/processed/
+data/feed_snapshots/
+data/inbox/
+data/ioc_store.db
+data/ioc_store.db-*
+*.joblib
+model/
+
+# Optional local results (uncomment if you don't want them public)
+# results/
+
+# Docker / local runtime
+docker-compose.override.yml
+*.pid
