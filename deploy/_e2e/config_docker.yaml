@@ -1,0 +1,24 @@
+# Container test config (relative paths as seen inside the image)
+bundle: model/deploy_live_netflow.joblib
+input:
+  path: data/inbox/flows.jsonl
+  format: jsonl
+  start_at_end: false
+batch:
+  max_flows: 64
+  flush_s: 1.0
+feeds:
+  online: false
+  poll_interval_min: 5
+  ttl_hours: 168.0
+  half_life_h: 6.0
+  snapshot_dir: data/feed_snapshots
+alerts:
+  jsonl: deploy/alerts/alerts.jsonl
+  webhook_url: ""
+  syslog_host: ""
+  syslog_port: 514
+  top_k_reasons: 3
+health:
+  host: 127.0.0.1
+  port: 8099
