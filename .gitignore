@@ -33,18 +33,13 @@ logs/
 *.log
 *.err
 
-# Large datasets & local artifacts (keep code, not bulk data)
+# Large datasets (keep local / host elsewhere)
 data/cicids2017/
 data/processed/
 data/feed_snapshots/
 data/inbox/
 data/ioc_store.db
 data/ioc_store.db-*
-*.joblib
-model/
-
-# Optional local results (uncomment if you don't want them public)
-# results/
 
 # Docker / local runtime
 docker-compose.override.yml
