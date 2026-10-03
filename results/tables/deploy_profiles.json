@@ -1,0 +1,40 @@
+{
+  "unsw_full": {
+    "bundle": "F:\\My Project\\apt-cti-thesis\\model\\deploy_unsw_full.joblib",
+    "n_features": 67,
+    "theta": 0.8802,
+    "test": {
+      "accuracy": 0.9925,
+      "precision": 0.9809033040315247,
+      "recall": 0.959383338274533,
+      "f1": 0.9700239808153477,
+      "pr_auc": 0.997696482448756,
+      "roc_auc": 0.999659346347263,
+      "fpr": 0.002704597816287689,
+      "n": 80000
+    },
+    "fit_seconds": 16.4
+  },
+  "live_netflow": {
+    "bundle": "F:\\My Project\\apt-cti-thesis\\model\\deploy_live_netflow.joblib",
+    "n_features": 38,
+    "theta": 0.8349,
+    "test": {
+      "accuracy": 0.9897,
+      "precision": 0.9567567567567568,
+      "recall": 0.9620515861251112,
+      "f1": 0.9593968660687888,
+      "pr_auc": 0.9960846761123708,
+      "roc_auc": 0.9994195043125839,
+      "fpr": 0.006296418196648589,
+      "n": 80000
+    },
+    "fit_seconds": 21.0
+  },
+  "delta_live_vs_full": {
+    "accuracy_pp": -0.28,
+    "recall_pp": 0.267,
+    "fpr_abs": 0.0035918203803609,
+    "pr_auc_pp": -0.161
+  }
+}
