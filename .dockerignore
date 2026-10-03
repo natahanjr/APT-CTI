@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+data/cicids2017/
+data/processed/
+data/inbox/
+data/*.csv
+data/*.parquet
+results/
+notebooks/
+deploy/_e2e/
+deploy/alerts/
+deploy/*.log
+*.log
+*.md
+!deploy/README.md
