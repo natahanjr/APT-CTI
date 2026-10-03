@@ -1,0 +1,75 @@
+════════════════════════════════════════════════════════════════════════════
+                         A P T - C T I   L I C E N S E
+              Real-Time Cyber Threat Intelligence Fusion with
+         Explainable Machine Learning for Early APT Prediction
+════════════════════════════════════════════════════════════════════════════
+
+  Repository : https://github.com/natahanjr/APT-CTI
+  Author     : Haaraphel (natahanjr)
+  Year       : 2026
+  Licence    : MIT
+
+──────────────────────────────────────────────────────────────────────────────
+  P R E A M B L E
+──────────────────────────────────────────────────────────────────────────────
+
+  This repository is an academic research artefact. It is released under the
+  MIT Licence so that other researchers, students, and defenders can study,
+  reproduce, and build upon the work with minimal friction.
+
+  You are free to use this code in your own thesis, paper, lab, or defensive
+  tooling — just keep the copyright notice and this licence file with any
+  substantial copy or redistribution.
+
+  If this work helps your research, a citation of the thesis title is
+  appreciated (see README.md). That is courtesy, not a legal requirement.
+
+──────────────────────────────────────────────────────────────────────────────
+  M I T   L I C E N S E
+──────────────────────────────────────────────────────────────────────────────
+
+Copyright (c) 2026 Haaraphel (natahanjr)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+──────────────────────────────────────────────────────────────────────────────
+  A C A D E M I C   N O T E S   ( n o t   l e g a l l y   b i n d i n g )
+──────────────────────────────────────────────────────────────────────────────
+
+  1. Datasets (CIC-IDS2017, UNSW-NB15) and third-party CTI feeds are NOT
+     covered by this licence. Respect each dataset provider's and feed
+     operator's terms of use.
+
+  2. MITRE ATT&CK content is subject to its own terms (see mitre.org).
+
+  3. This software is for research and defensive evaluation. Do not use it
+     to attack systems you do not own or are not authorised to test.
+
+  4. Models trained on public benchmarks may overstate live performance;
+     read docs/RESULTS.md before quoting metrics.
+
+──────────────────────────────────────────────────────────────────────────────
+  S U M M A R Y   I N   O N E   L I N E
+──────────────────────────────────────────────────────────────────────────────
+
+  USE IT · STUDY IT · IMPROVE IT · SHARE IT · JUST KEEP THE CREDIT
+
+════════════════════════════════════════════════════════════════════════════
+  End of licence — APT-CTI — MIT — 2026
+════════════════════════════════════════════════════════════════════════════
