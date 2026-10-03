@@ -1,0 +1,32 @@
+bundle: F:\My Project\apt-cti-thesis\model\deploy_live_netflow.joblib
+input:
+  path: F:\My Project\apt-cti-thesis\deploy\_e2e\auth_flows.jsonl
+  format: jsonl
+  start_at_end: true
+batch:
+  max_flows: 64
+  flush_s: 1.0
+feeds:
+  online: false
+  poll_interval_min: 5
+  ttl_hours: 168.0
+  half_life_h: 6.0
+  snapshot_dir: F:\My Project\apt-cti-thesis\data\feed_snapshots
+alerts:
+  jsonl: F:\My Project\apt-cti-thesis\deploy\_e2e\auth_alerts.jsonl
+  rotate_mb: 0.0001
+  keep_files: 8
+  audit_log: F:\My Project\apt-cti-thesis\deploy\_e2e\auth_audit.log
+  webhook_url: ""
+  syslog_host: ""
+  syslog_port: 514
+  top_k_reasons: 3
+auth:
+  token: e2e-secret
+  explain_per_min: 2
+health:
+  host: 127.0.0.1
+  port: 18101
+xai:
+  reasoning_effort: low
+  timeout_s: 60
