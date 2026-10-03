@@ -1,0 +1,382 @@
+{
+  "dataset": "cicids2017",
+  "n_features": 86,
+  "cv_folds": 5,
+  "sightings_summary": {
+    "n_indicators": 16071,
+    "n_sightings_live": 83378,
+    "n_sightings_injected": 30050,
+    "n_multi_source": 82,
+    "injection": "controlled",
+    "injection_rate": 0.6,
+    "benign_ioc_rate": 0.004
+  },
+  "fold_metrics": [
+    {
+      "accuracy": 0.99190625,
+      "precision": 1.0,
+      "recall": 0.9589149746192893,
+      "f1": 0.9790266418333469,
+      "pr_auc": 0.9999690926538686,
+      "roc_auc": 0.9999922926191677,
+      "fpr": 0.0,
+      "theta": 0.982181905932276,
+      "tn": 51392,
+      "fp": 0,
+      "fn": 518,
+      "tp": 12090,
+      "n": 64000,
+      "n_alerts": 12090,
+      "fold": 1
+    },
+    {
+      "accuracy": 0.99240625,
+      "precision": 0.9999175189706367,
+      "recall": 0.9615323604060914,
+      "f1": 0.980349344978166,
+      "pr_auc": 0.9999442758952921,
+      "roc_auc": 0.9999866100848815,
+      "fpr": 1.9458281444582814e-05,
+      "theta": 0.9805973113211173,
+      "tn": 51391,
+      "fp": 1,
+      "fn": 485,
+      "tp": 12123,
+      "n": 64000,
+      "n_alerts": 12124,
+      "fold": 2
+    },
+    {
+      "accuracy": 0.991671875,
+      "precision": 0.9999171979796307,
+      "recall": 0.9578045685279187,
+      "f1": 0.9784079400445614,
+      "pr_auc": 0.9999544237629734,
+      "roc_auc": 0.9999886812312726,
+      "fpr": 1.9458281444582814e-05,
+      "theta": 0.9822940905493636,
+      "tn": 51391,
+      "fp": 1,
+      "fn": 532,
+      "tp": 12076,
+      "n": 64000,
+      "n_alerts": 12077,
+      "fold": 3
+    },
+    {
+      "accuracy": 0.99228125,
+      "precision": 0.9999174645097392,
+      "recall": 0.9608978426395939,
+      "f1": 0.9800194143342501,
+      "pr_auc": 0.9999236284602931,
+      "roc_auc": 0.9999813920923717,
+      "fpr": 1.9458281444582814e-05,
+      "theta": 0.9827949746126086,
+      "tn": 51391,
+      "fp": 1,
+      "fn": 493,
+      "tp": 12115,
+      "n": 64000,
+      "n_alerts": 12116,
+      "fold": 4
+    },
+    {
+      "accuracy": 0.992296875,
+      "precision": 0.9999174645097392,
+      "recall": 0.9609740620290315,
+      "f1": 0.9800590543218864,
+      "pr_auc": 0.9999599008029997,
+      "roc_auc": 0.9999900866098309,
+      "fpr": 1.9457902827233282e-05,
+      "theta": 0.9812524288238493,
+      "tn": 51392,
+      "fp": 1,
+      "fn": 492,
+      "tp": 12115,
+      "n": 64000,
+      "n_alerts": 12116,
+      "fold": 5
+    }
+  ],
+  "top10_features": [
+    "ioc_dst_match",
+    "feed_age_score",
+    "source_count",
+    "feed_confidence",
+    "reputation_bucket",
+    "Min Packet Length",
+    "Bwd Packet Length Std",
+    "ioc_src_match",
+    "Packet Length Std",
+    "Init_Win_bytes_forward"
+  ],
+  "top10_strength": {
+    "ioc_dst_match": 0.10060671760597055,
+    "feed_age_score": 0.054713032605140974,
+    "source_count": 0.03958616140646426,
+    "feed_confidence": 0.03625753789759771,
+    "reputation_bucket": 0.03156801637092359,
+    "Min Packet Length": 0.017731133352710204,
+    "Bwd Packet Length Std": 0.013427101882021026,
+    "ioc_src_match": 0.013338289574306194,
+    "Packet Length Std": 0.012864317977157102,
+    "Init_Win_bytes_forward": 0.012770777509220486
+  },
+  "stability_top10_jaccard": {
+    "mean": 0.7016317016317017,
+    "min": 0.5384615384615384,
+    "pairs": [
+      0.6666666666666666,
+      0.5384615384615384,
+      0.6666666666666666,
+      0.5384615384615384,
+      0.8181818181818182,
+      0.8181818181818182,
+      0.8181818181818182,
+      0.6666666666666666,
+      0.8181818181818182,
+      0.6666666666666666
+    ]
+  },
+  "h3_jaccard_mean": 0.7016317016317017,
+  "h3_pass": true,
+  "tactic_stability": {
+    "mean_top4_jaccard": 1.0,
+    "mean_tv_distance": 0.008298765932909413,
+    "mean_distribution": {
+      "Collection": 0.014667829615525818,
+      "Command and Control": 0.5181681795672202,
+      "Exfiltration": 0.044898883978577095,
+      "Uncategorised": 0.4222651068386769
+    },
+    "top_tactics_per_fold": [
+      [
+        "Command and Control",
+        "Uncategorised",
+        "Exfiltration",
+        "Collection"
+      ],
+      [
+        "Command and Control",
+        "Uncategorised",
+        "Exfiltration",
+        "Collection"
+      ],
+      [
+        "Command and Control",
+        "Uncategorised",
+        "Exfiltration",
+        "Collection"
+      ],
+      [
+        "Command and Control",
+        "Uncategorised",
+        "Exfiltration",
+        "Collection"
+      ],
+      [
+        "Command and Control",
+        "Uncategorised",
+        "Exfiltration",
+        "Collection"
+      ]
+    ]
+  },
+  "test_metrics": {
+    "accuracy": 0.991975,
+    "precision": 0.9999338624338624,
+    "recall": 0.9593274111675127,
+    "f1": 0.9792098445595855,
+    "pr_auc": 0.99996079038141,
+    "roc_auc": 0.9999903795095803,
+    "fpr": 1.556662515566625e-05,
+    "theta": 0.984058175751798,
+    "tn": 64239,
+    "fp": 1,
+    "fn": 641,
+    "tp": 15119,
+    "n": 80000,
+    "n_alerts": 15120
+  },
+  "theta": 0.984058175751798,
+  "n_alerts_explained": 400,
+  "alerts_with_cti_reason": 400,
+  "alert_cti_reason_share": 1.0,
+  "reason_tactic_distribution": {
+    "Command and Control": 1196,
+    "Uncategorised": 4
+  },
+  "alerts_path": "F:\\My Project\\apt-cti-thesis\\results\\alerts\\alerts_cicids2017.jsonl",
+  "example_alerts": [
+    {
+      "row": 469,
+      "score": 1.0,
+      "theta": 0.9841,
+      "label": 1,
+      "attack_cat": "DDoS",
+      "timestamp": 1499399880.0,
+      "reason_codes": [
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": 0.09763,
+          "reason": "destination IP appears on a live CTI feed",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "feed_age_score",
+          "value": 0.9944,
+          "shap": 0.05827,
+          "reason": "intel freshness score 0.99 (higher = fresher sighting)",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "source_count",
+          "value": 3.0,
+          "shap": 0.05453,
+          "reason": "3 independent feed(s) report this indicator",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    },
+    {
+      "row": 618,
+      "score": 1.0,
+      "theta": 0.9841,
+      "label": 1,
+      "attack_cat": "PortScan",
+      "timestamp": 1499396100.0,
+      "reason_codes": [
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": 0.09554,
+          "reason": "destination IP appears on a live CTI feed",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "feed_age_score",
+          "value": 0.9906,
+          "shap": 0.05792,
+          "reason": "intel freshness score 0.99 (higher = fresher sighting)",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "source_count",
+          "value": 3.0,
+          "shap": 0.05514,
+          "reason": "3 independent feed(s) report this indicator",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    },
+    {
+      "row": 811,
+      "score": 1.0,
+      "theta": 0.9841,
+      "label": 1,
+      "attack_cat": "DoS Hulk",
+      "timestamp": 1499251440.0,
+      "reason_codes": [
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": 0.08592,
+          "reason": "destination IP appears on a live CTI feed",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "feed_age_score",
+          "value": 0.9925,
+          "shap": 0.05211,
+          "reason": "intel freshness score 0.99 (higher = fresher sighting)",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "source_count",
+          "value": 3.0,
+          "shap": 0.04654,
+          "reason": "3 independent feed(s) report this indicator",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    },
+    {
+      "row": 1510,
+      "score": 0.9999,
+      "theta": 0.9841,
+      "label": 1,
+      "attack_cat": "PortScan",
+      "timestamp": 1499395920.0,
+      "reason_codes": [
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": 0.09402,
+          "reason": "destination IP appears on a live CTI feed",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "feed_age_score",
+          "value": 0.9963,
+          "shap": 0.05796,
+          "reason": "intel freshness score 1.00 (higher = fresher sighting)",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "source_count",
+          "value": 3.0,
+          "shap": 0.05428,
+          "reason": "3 independent feed(s) report this indicator",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    },
+    {
+      "row": 1663,
+      "score": 1.0,
+      "theta": 0.9841,
+      "label": 1,
+      "attack_cat": "PortScan",
+      "timestamp": 1499396100.0,
+      "reason_codes": [
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": 0.09576,
+          "reason": "destination IP appears on a live CTI feed",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "feed_age_score",
+          "value": 0.9906,
+          "shap": 0.05842,
+          "reason": "intel freshness score 0.99 (higher = fresher sighting)",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        },
+        {
+          "feature": "source_count",
+          "value": 3.0,
+          "shap": 0.05509,
+          "reason": "3 independent feed(s) report this indicator",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    }
+  ]
+}
