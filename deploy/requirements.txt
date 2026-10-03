@@ -1,0 +1,9 @@
+# Runtime dependencies for the scoring service only
+# (the root requirements.txt covers the full research pipeline)
+pandas>=2.2
+numpy>=2.0,<2.5
+scikit-learn>=1.5
+joblib>=1.4
+shap>=0.46
+requests>=2.32
+PyYAML>=6.0
