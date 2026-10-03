@@ -1,0 +1,421 @@
+{
+  "dataset": "unsw_nb15",
+  "n_features": 67,
+  "cv_folds": 5,
+  "sightings_summary": {
+    "n_indicators": 15997,
+    "n_sightings_live": 83378,
+    "n_sightings_injected": 109418,
+    "n_multi_source": 9,
+    "injection": "controlled",
+    "injection_rate": 0.6,
+    "benign_ioc_rate": 0.004
+  },
+  "fold_metrics": [
+    {
+      "accuracy": 0.992171875,
+      "precision": 0.9724987555998009,
+      "recall": 0.9654107473749228,
+      "f1": 0.9689417891017296,
+      "pr_auc": 0.9974428235738982,
+      "roc_auc": 0.9996241263207973,
+      "fpr": 0.003953134782219837,
+      "theta": 0.8537738836290842,
+      "tn": 55684,
+      "fp": 221,
+      "fn": 280,
+      "tp": 7815,
+      "n": 64000,
+      "n_alerts": 8036,
+      "fold": 1
+    },
+    {
+      "accuracy": 0.99240625,
+      "precision": 0.9789751982878006,
+      "recall": 0.9605929586164299,
+      "f1": 0.9696969696969697,
+      "pr_auc": 0.9976898198909423,
+      "roc_auc": 0.9996614723899334,
+      "fpr": 0.0029872104462928184,
+      "theta": 0.869543242355387,
+      "tn": 55738,
+      "fp": 167,
+      "fn": 319,
+      "tp": 7776,
+      "n": 64000,
+      "n_alerts": 7943,
+      "fold": 2
+    },
+    {
+      "accuracy": 0.992265625,
+      "precision": 0.9753565173880411,
+      "recall": 0.9631871525633107,
+      "f1": 0.9692336378892411,
+      "pr_auc": 0.9975017671250026,
+      "roc_auc": 0.9996328943938305,
+      "fpr": 0.0035238350773633843,
+      "theta": 0.8637526508078381,
+      "tn": 55708,
+      "fp": 197,
+      "fn": 298,
+      "tp": 7797,
+      "n": 64000,
+      "n_alerts": 7994,
+      "fold": 3
+    },
+    {
+      "accuracy": 0.991671875,
+      "precision": 0.971681636726547,
+      "recall": 0.9621988882025942,
+      "f1": 0.9669170132207808,
+      "pr_auc": 0.9973546117251608,
+      "roc_auc": 0.9996085081907072,
+      "fpr": 0.00406045970843395,
+      "theta": 0.8585927548133327,
+      "tn": 55678,
+      "fp": 227,
+      "fn": 306,
+      "tp": 7789,
+      "n": 64000,
+      "n_alerts": 8016,
+      "fold": 4
+    },
+    {
+      "accuracy": 0.991234375,
+      "precision": 0.9738397685825683,
+      "recall": 0.9563982213438735,
+      "f1": 0.9650401944288652,
+      "pr_auc": 0.9973491760294811,
+      "roc_auc": 0.9996114527784503,
+      "fpr": 0.003720663995420721,
+      "theta": 0.8656783500175526,
+      "tn": 55696,
+      "fp": 208,
+      "fn": 353,
+      "tp": 7743,
+      "n": 64000,
+      "n_alerts": 7951,
+      "fold": 5
+    }
+  ],
+  "top10_features": [
+    "ct_state_ttl",
+    "sttl",
+    "Dload",
+    "dmeansz",
+    "reputation_bucket",
+    "source_count",
+    "sbytes",
+    "dttl",
+    "state_INT",
+    "feed_age_score"
+  ],
+  "top10_strength": {
+    "ct_state_ttl": 0.12291558053793206,
+    "sttl": 0.11518389048832525,
+    "Dload": 0.02901333253985978,
+    "dmeansz": 0.0260956081199172,
+    "reputation_bucket": 0.023698337137374025,
+    "source_count": 0.017952845655880352,
+    "sbytes": 0.017615858845934872,
+    "dttl": 0.017050201415759768,
+    "state_INT": 0.016510034126917046,
+    "feed_age_score": 0.014854212190582621
+  },
+  "stability_top10_jaccard": {
+    "mean": 0.890909090909091,
+    "min": 0.8181818181818182,
+    "pairs": [
+      1.0,
+      0.8181818181818182,
+      0.8181818181818182,
+      0.8181818181818182,
+      0.8181818181818182,
+      0.8181818181818182,
+      0.8181818181818182,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "h3_jaccard_mean": 0.890909090909091,
+  "h3_pass": true,
+  "tactic_stability": {
+    "mean_top4_jaccard": 1.0,
+    "mean_tv_distance": 0.01793016724941517,
+    "mean_distribution": {
+      "Collection": 0.07007747550478426,
+      "Command and Control": 0.18006535189856637,
+      "Credential Access": 8.502043777132714e-06,
+      "Defense Evasion": 0.5073586641467639,
+      "Discovery": 0.0276259102352789,
+      "Exfiltration": 0.13679100961645524,
+      "Initial Access": 0.0004759212360944631,
+      "Lateral Movement": 0.023823773592363692,
+      "Uncategorised": 0.05377339172591605
+    },
+    "top_tactics_per_fold": [
+      [
+        "Defense Evasion",
+        "Command and Control",
+        "Exfiltration",
+        "Collection"
+      ],
+      [
+        "Defense Evasion",
+        "Command and Control",
+        "Exfiltration",
+        "Collection"
+      ],
+      [
+        "Defense Evasion",
+        "Command and Control",
+        "Exfiltration",
+        "Collection"
+      ],
+      [
+        "Defense Evasion",
+        "Command and Control",
+        "Exfiltration",
+        "Collection"
+      ],
+      [
+        "Defense Evasion",
+        "Command and Control",
+        "Exfiltration",
+        "Collection"
+      ]
+    ]
+  },
+  "test_metrics": {
+    "accuracy": 0.9925,
+    "precision": 0.9809033040315247,
+    "recall": 0.959383338274533,
+    "f1": 0.9700239808153477,
+    "pr_auc": 0.997696482448756,
+    "roc_auc": 0.999659346347263,
+    "fpr": 0.002704597816287689,
+    "theta": 0.8802034459559828,
+    "tn": 69692,
+    "fp": 189,
+    "fn": 411,
+    "tp": 9708,
+    "n": 80000,
+    "n_alerts": 9897
+  },
+  "theta": 0.8802034459559828,
+  "n_alerts_explained": 400,
+  "alerts_with_cti_reason": 333,
+  "alert_cti_reason_share": 0.8325,
+  "reason_tactic_distribution": {
+    "Defense Evasion": 851,
+    "Command and Control": 333,
+    "Exfiltration": 290,
+    "Collection": 51
+  },
+  "alerts_path": "F:\\My Project\\apt-cti-thesis\\results\\alerts\\alerts_unsw_nb15.jsonl",
+  "example_alerts": [
+    {
+      "row": 513,
+      "score": 0.9993,
+      "theta": 0.8802,
+      "label": 1,
+      "attack_cat": "Generic",
+      "timestamp": 1424237676.0,
+      "reason_codes": [
+        {
+          "feature": "sttl",
+          "value": 254.0,
+          "shap": 0.12196,
+          "reason": "source TTL = 254",
+          "tactic": "Defense Evasion",
+          "technique": "T1090 \u00b7 Proxy"
+        },
+        {
+          "feature": "ct_state_ttl",
+          "value": 2.0,
+          "shap": 0.09677,
+          "reason": "connection-state TTL class = 2",
+          "tactic": "Defense Evasion",
+          "technique": "T1027 \u00b7 Obfuscated Files or Information"
+        },
+        {
+          "feature": "Dload",
+          "value": 0.0,
+          "shap": 0.03424,
+          "reason": "downlink bit-rate = 0",
+          "tactic": "Exfiltration",
+          "technique": "T1041 \u00b7 Exfiltration over C2 channel"
+        },
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": null,
+          "reason": "destination IP is on the live CTI feed (freshness 0.99, confidence 0.95, 3 source(s))",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    },
+    {
+      "row": 630,
+      "score": 0.9772,
+      "theta": 0.8802,
+      "label": 1,
+      "attack_cat": "Reconnaissance",
+      "timestamp": 1424251475.0,
+      "reason_codes": [
+        {
+          "feature": "sttl",
+          "value": 254.0,
+          "shap": 0.1624,
+          "reason": "source TTL = 254",
+          "tactic": "Defense Evasion",
+          "technique": "T1090 \u00b7 Proxy"
+        },
+        {
+          "feature": "ct_state_ttl",
+          "value": 2.0,
+          "shap": 0.10899,
+          "reason": "connection-state TTL class = 2",
+          "tactic": "Defense Evasion",
+          "technique": "T1027 \u00b7 Obfuscated Files or Information"
+        },
+        {
+          "feature": "dmeansz",
+          "value": 0.0,
+          "shap": 0.05394,
+          "reason": "mean downlink segment size = 0",
+          "tactic": "Collection",
+          "technique": "T1005 \u00b7 Data from Local Network Storage"
+        }
+      ]
+    },
+    {
+      "row": 800,
+      "score": 0.9987,
+      "theta": 0.8802,
+      "label": 1,
+      "attack_cat": "Generic",
+      "timestamp": 1424223559.0,
+      "reason_codes": [
+        {
+          "feature": "sttl",
+          "value": 254.0,
+          "shap": 0.1176,
+          "reason": "source TTL = 254",
+          "tactic": "Defense Evasion",
+          "technique": "T1090 \u00b7 Proxy"
+        },
+        {
+          "feature": "ct_state_ttl",
+          "value": 2.0,
+          "shap": 0.09173,
+          "reason": "connection-state TTL class = 2",
+          "tactic": "Defense Evasion",
+          "technique": "T1027 \u00b7 Obfuscated Files or Information"
+        },
+        {
+          "feature": "Dload",
+          "value": 0.0,
+          "shap": 0.0347,
+          "reason": "downlink bit-rate = 0",
+          "tactic": "Exfiltration",
+          "technique": "T1041 \u00b7 Exfiltration over C2 channel"
+        },
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": null,
+          "reason": "destination IP is on the live CTI feed (freshness 0.99, confidence 0.95, 3 source(s))",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    },
+    {
+      "row": 1474,
+      "score": 0.9969,
+      "theta": 0.8802,
+      "label": 1,
+      "attack_cat": "Exploits",
+      "timestamp": 1421930602.0,
+      "reason_codes": [
+        {
+          "feature": "sttl",
+          "value": 254.0,
+          "shap": 0.11824,
+          "reason": "source TTL = 254",
+          "tactic": "Defense Evasion",
+          "technique": "T1090 \u00b7 Proxy"
+        },
+        {
+          "feature": "ct_state_ttl",
+          "value": 2.0,
+          "shap": 0.08878,
+          "reason": "connection-state TTL class = 2",
+          "tactic": "Defense Evasion",
+          "technique": "T1027 \u00b7 Obfuscated Files or Information"
+        },
+        {
+          "feature": "Dload",
+          "value": 0.0,
+          "shap": 0.03487,
+          "reason": "downlink bit-rate = 0",
+          "tactic": "Exfiltration",
+          "technique": "T1041 \u00b7 Exfiltration over C2 channel"
+        },
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": null,
+          "reason": "destination IP is on the live CTI feed (freshness 0.99, confidence 0.95, 3 source(s))",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    },
+    {
+      "row": 1697,
+      "score": 0.9985,
+      "theta": 0.8802,
+      "label": 1,
+      "attack_cat": "Generic",
+      "timestamp": 1424239037.0,
+      "reason_codes": [
+        {
+          "feature": "sttl",
+          "value": 254.0,
+          "shap": 0.1204,
+          "reason": "source TTL = 254",
+          "tactic": "Defense Evasion",
+          "technique": "T1090 \u00b7 Proxy"
+        },
+        {
+          "feature": "ct_state_ttl",
+          "value": 2.0,
+          "shap": 0.09773,
+          "reason": "connection-state TTL class = 2",
+          "tactic": "Defense Evasion",
+          "technique": "T1027 \u00b7 Obfuscated Files or Information"
+        },
+        {
+          "feature": "Dload",
+          "value": 0.0,
+          "shap": 0.03335,
+          "reason": "downlink bit-rate = 0",
+          "tactic": "Exfiltration",
+          "technique": "T1041 \u00b7 Exfiltration over C2 channel"
+        },
+        {
+          "feature": "ioc_dst_match",
+          "value": 1.0,
+          "shap": null,
+          "reason": "destination IP is on the live CTI feed (freshness 1.00, confidence 0.95, 3 source(s))",
+          "tactic": "Command and Control",
+          "technique": "T1071 \u00b7 Application Layer Protocol"
+        }
+      ]
+    }
+  ]
+}
